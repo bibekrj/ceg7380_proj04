@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: aliceblue;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        #reset {
+            text-decoration: none;
+        }
+
+        .main {
+            display: flex;
+        }
+
+        .side {
+            flex: 50%;
+        }
+
+        #submit,
+        #update,
+        #stop,
+        #reset {
+            background-color: white;
+            color: black;
+
+            /* background-color: #4CAF50; */
+            /* Green */
+            /* border: none; */
+            /* color: white; */
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            /* display: inline-block; */
+            font-size: 16px;
+            width: 120px;
+        }
+
+        #submit {
+            border: 2px solid #4CAF50;
+        }
+
+        #submit:hover {
+            background-color: #4CAF50;
+            /* Green */
+            color: white;
+        }
+
+        #stop {
+            border: 2px solid red;
+        }
+
+        #stop:hover {
+            background-color: red;
+            color: white;
+        }
+
+        #update {
+            border: 2px solid blue;
+        }
+
+        #update:hover {
+            background-color: blue;
+            color: white;
+        }
+
+        #reset {
+            border: 2px solid black;
+        }
+
+        #reset:hover {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1> Travelling Sales Man Problem</h1>
+
+    <div class='main'>
+        <div class='side'>
+            <table>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <tr>
+                        <td>Weight Type</td>
+                        <td colspan=2>{{form.weightType}}</td>
+
+                    </tr>
+                    <tr>
+                        <td> Random Seed </td>
+                        <td colspan=2> {{form.randomSeed}}
+                    </tr>
+                    <tr>
+                        <td>Number of Try</td>
+                        <td colspan=2> {{form.numOfTrys}}</td>
+                    </tr>
+                    <tr>
+                        <td>Number of Batch</td>
+                        <td colspan=2>{{form.numOfBatch}}</td>
+                    </tr>
+                    <tr>
+
+                        <td><button type='submit' value='update' name='update' id="update">Update</a></button></td>
+                        {% if jbstatus == "nstarted" %}
+                        <td><button type="submit" name='submit' value='submit' id="submit">START</button></td>
+                        {% else %}
+                        <td><button value="stop" name='stop' id="stop"> STOP </button> </td>
+                        {% endif %}
+                        <td><button name='reset' id='reset' id="reset">Reset</a></button></td>
+                    </tr>
+
+                </form>
+            </table>
+        </div>
+        <div class='side'>
+
+            <table>
+                <tr>
+                    <td>
+
+                        Job Status
+
+                    </td>
+                    <td>
+                        {{ message }}
+
+                    </td>
+                </tr>
+                <tr>
+
+                    <td> Best Distance So Far</td>
+                    {% if newdist == 'found' %}
+                    <td> {{ distVal }} </td>
+                    {% else %}
+                    <td> NA </td>
+                    {% endif%}
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>
