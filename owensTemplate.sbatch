@@ -32,7 +32,10 @@ do
 done
 wait
 
-current_best_MYATTEMPT_NUM=`cut -d ":" -f2 ../resultsMYATTEMPT.txt| uniq |sort | head -n1`
+#current_best_MYATTEMPT_NUM=`cut -d ":" -f2 ../resultsMYATTEMPT.txt| uniq |sort | head -n1`
+current_best_MYATTEMPT_NUM=`grep "BEST" ../resultsMYATTEMPT.txt | cut -d ":" -f2 | uniq | sort | head -n 1`
+
+
 #echo $current_best_MYATTEMPT_NUM
 
 best_pickle_file=`grep "$current_best_MYATTEMPT_NUM" ../resultsMYATTEMPT.txt | cut -d ":" -f1 | head -n 1`

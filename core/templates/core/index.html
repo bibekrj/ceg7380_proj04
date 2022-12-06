@@ -19,10 +19,31 @@
 
         .main {
             display: flex;
+            background-color: darkgrey;
+            padding: 10px;
+            margin:10px;
         }
 
-        .side {
+        .main2{
+            background-color: darkgrey;
+            padding: 30px;
+            margin:10px;
+        }
+
+        .side1 {
             flex: 50%;
+            background-color: aliceblue;
+            margin:2px;
+            padding:10px;
+
+        }
+
+        .side2{
+            flex:50%;
+            background-color: aliceblue;
+            margin:2px;
+            padding:10px;
+
         }
 
         #submit,
@@ -84,11 +105,15 @@
 </head>
 
 <body>
+    <div class="main2">
 
     <h1> Travelling Sales Man Problem</h1>
+    <h2> <em>proj04 -  Cloud Computing - CEG 7380 - Bibek Raj Joshi - w140bxj </em></h2>
+
+    </div>
 
     <div class='main'>
-        <div class='side'>
+        <div class='side1'>
             <table>
                 <form action="" method="post">
                     {% csrf_token %}
@@ -110,8 +135,8 @@
                         <td colspan=2>{{form.numOfBatch}}</td>
                     </tr>
                     <tr>
-
-                        <td><button type='submit' value='update' name='update' id="update">Update</a></button></td>
+                         <td><button type='submit' value='update' name='update' id="update">Update</a></button></td>
+                       
                         {% if jbstatus == "nstarted" %}
                         <td><button type="submit" name='submit' value='submit' id="submit">START</button></td>
                         {% else %}
@@ -123,7 +148,7 @@
                 </form>
             </table>
         </div>
-        <div class='side'>
+        <div class='side2'>
 
             <table>
                 <tr>

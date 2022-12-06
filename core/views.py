@@ -30,7 +30,32 @@ def index(request):
         form = TSPForm(request.POST)
         j_status = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $5}' " ).read().rstrip('\n')
         print(j_status)
-        if j_status == "R":
+
+       
+        bestFile = os.path.exists('best.txt')
+        
+        if bestFile:
+            print('bestfileFound')
+            bestFile_ = open('best.txt','r')
+            bestFile_all_content = bestFile_.readlines()
+            bestFile_type = bestFile_all_content[0].rstrip('\n')
+            bestFile_distance = bestFile_all_content[1].rstrip('\n')
+            print(bestFile_type, "The type of response")
+            print(bestFile_distance, "the distance")
+            bestFile_.close()
+            os.popen('rm best.txt')
+
+            context={
+                'form': form,
+                'newdist': 'found',
+                'distVal': bestFile_distance,
+                'jbstatus': 'nstarted',
+                'message': "Best Distance Found"
+            }
+            
+    
+
+        elif j_status == "R":
             jobnumber = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $3}' " ).read().rstrip('\n')
             batch_number = jobnumber+ " of "+str(request.POST['numOfBatch']) 
             context = {
@@ -90,19 +115,9 @@ def index(request):
         picklefilename = pickleReader('initialGuess.pickle')
 
         print('about to call workflow')
+        global work 
         work = subprocess.Popen([value/"workflow.sh", weightType, picklefilename, randomSeed, numOfTrys, numOfBatch, current_best_distance ])
-
-        # print('workflow  should be complete', work.communicate())
-
-        # best = os.system('echo $?')
-        # print("The last exit code is ", best)
-        # while True:
-        #     file_exists = os.path.exists('readme.txt')
-        #     if file_exists:
-        #         best = open('bestFound.txt', 'r')
-        #         bestcontent= best.read()
-        #         best.close()
-        #         False
+        # print(work)
 
         context = {
             'form': form,
@@ -119,19 +134,21 @@ def index(request):
         print(j_status)
         if j_status == "PD": 
             j_id = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $1}' " ).read().rstrip('\n')
-            print('founding runnign job on owens')
+            print('First condition: looking for  running job on owens')
             os.system('touch STOP')
             os.system("ssh " +owens+" scancel "+str(j_id))
+            message_d = 'Stop Without Care'
         else:
             os.system('touch STOP')
             time.sleep(10)
             j_id = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $1}' " ).read().rstrip('\n')
-            print('founding runnign job on owens')
+            print('Second Condition: looking for   runnign job on owens')
             os.system("ssh " +owens+" scancel "+str(j_id))
+            message_d = 'Stopped with Values'
 
         context = {
             'form': form,
-            'message': 'STOPPED',
+            'message': message_d,
             'jbstatus': 'nstarted'
         }
  
@@ -151,7 +168,7 @@ def index(request):
             j_id = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $1}' " ).read().rstrip('\n')
             os.system("ssh " +owens+" scancel "+str(j_id))
 
-
+        work.kill()
 
     
     return render(request, 'core/index.html', context)
