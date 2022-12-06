@@ -28,6 +28,8 @@ END=$5
 PICKLEFILE=$2
 RANDSEED=$3
 NOOFTRYS=$4
+LOOP_START=0
+LOOP_END=15
 echo $END
 echo $START
 echo 'variables loaded'
@@ -39,7 +41,7 @@ for ((i=${START}; i<${END}; i++));
         echo "the value of i is $i"
         echo "Pickle File is "$PICKLEFILE" "
         owensFileName="owensJob$i.sbatch"
-        sed -e 's/MYATTEMPT/'$i'/g' -e 's/MYDIR/attempt'$i'/g' -e 's/DISTANCEPICKLENUMBER/'$WEIGHT'/g' -e 's/PICKLEFILENAME/'$PICKLEFILE'/g' -e 's/RANDSEED/'$RANDSEED'/g' -e 's/NOOFTRYS/'$NOOFTRYS'/g' -e 's/LOOPSTART/0/g' -e 's/LOOPEND/16/g' owensTemplate.sbatch > $owensFileName
+        sed -e 's/MYATTEMPT/'$i'/g' -e 's/MYDIR/attempt'$i'/g' -e 's/DISTANCEPICKLENUMBER/'$WEIGHT'/g' -e 's/PICKLEFILENAME/'$PICKLEFILE'/g' -e 's/RANDSEED/'$RANDSEED'/g' -e 's/NOOFTRYS/'$NOOFTRYS'/g' -e 's/LOOPSTART/'$LOOP_START'/g' -e 's/LOOPEND/'$LOOP_END'/g' owensTemplate.sbatch > $owensFileName
         
         echo 'sending Prepared batch template to  owens '
         
@@ -179,6 +181,8 @@ for ((i=${START}; i<${END}; i++));
                         # ssh ${owens} "rm cleanupcrew.sh"
                         echo 'DID NOT GET BEST DISTANCE'
                     fi
+                    LOOP_START=$(($LOOP_START+16))
+                    LOOP_END=$(($LOOP_END+16))
                     # exit 0
 
                 fi
@@ -196,7 +200,7 @@ for ((i=${START}; i<${END}; i++));
 
 
             #     echo '*********************************'
-                echo "the current best distance is "$bestDistance" "
+                echo " from the incomplete run the current best distance is "$bestDistance" "
 
                 if [ "$overallRunBest" -lt "$bestDistance" ]; then
             #         echo 'FOUND'
@@ -250,7 +254,7 @@ for ((i=${START}; i<${END}; i++));
                 
                  else
                     echo 'NOTFOUND' >best.txt
-                    echo 'FALSE'>>best.txt
+                    echo 'FALSE'>> best.txt
                     exit
                 fi
             
@@ -263,7 +267,7 @@ for ((i=${START}; i<${END}; i++));
                 echo 'RAND_SEED':$3 >> SAVEDSTATE
                 echo 'PICKLE_FILE_NAME':$PICKLEFILE >> SAVEDSTATE
                 echo 'NO_OF_TRYS':$4 >> SAVEDSTATE
-                rm "STOP"
+                # rm "STOP"
                 exit 2
 
         fi
