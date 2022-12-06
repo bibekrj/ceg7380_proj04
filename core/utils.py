@@ -6,8 +6,8 @@ def pickleReader(fileName):
     rfile = open(fileName, 'rb')
     val1= pickle.load(rfile)
     val = pickle.load(rfile)
-    print(val1)
-    print(val)
+    # print(val1)
+    # print(val)
     rfile.close()
     return fileName
 
