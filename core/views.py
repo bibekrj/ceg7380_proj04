@@ -16,8 +16,6 @@ value = settings.BASE_DIR
 
 owens = 'w140bxj@owens.osc.edu'
 
-
-
 def index(request):
     jbstatus = ''
     context = {
@@ -33,7 +31,6 @@ def index(request):
 
        
         bestFile = os.path.exists('best.txt')
-        
         if bestFile:
             print('bestfileFound')
             bestFile_ = open('best.txt','r')
@@ -52,8 +49,16 @@ def index(request):
                 'jbstatus': 'nstarted',
                 'message': "Best Distance Found"
             }
-            
-    
+
+        elif j_status == "PD":
+            jobnumner = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $3}' " ).read().rstrip('\n')
+            context = {
+                'form': form,
+                'newdist': 'found',
+                'distVal': "PENDING",
+                'jbstatus': '',
+                'message': 'JOB NOT STARTED'
+            }
 
         elif j_status == "R":
             jobnumber = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $3}' " ).read().rstrip('\n')
@@ -65,18 +70,9 @@ def index(request):
                 'jbstatus': '',
                 'message': 'Running'
             }
-        elif j_status == "PD":
-            jobnumner = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $3}' " ).read().rstrip('\n')
-            context = {
-                'form': form,
-                'newdist': 'found',
-                'distVal': "PENDING",
-                'jbstatus': '',
-                'message': 'JOB NOT STARTED'
-            }
-        else:
         
-            print(request.POST['weightType'])
+        else:  
+            print("The weight selected was ",request.POST['weightType'])
             weightType = request.POST['weightType']
             currentBest = os.popen('ssh ' + owens + " source ~nehrbajo/proj03data/update03.sh " + weightType).read().rstrip('\n')
             context = {
@@ -84,12 +80,10 @@ def index(request):
                 'newdist': 'found',
                 'distVal': currentBest,
                 'jbstatus': 'nstarted',
-                'message': 'NOT STARTED'
+                'message': 'NOT STARTED, weight selected '+str(weightType)
             }
 
         
-
-
     if 'submit' in request.POST:
         form = TSPForm(request.POST)
         weightType = request.POST.get('weightType')
@@ -102,7 +96,6 @@ def index(request):
         print('The number ofTrys is ', numOfTrys)
         print('The number of batches is ', numOfBatch)
 
-        
         print(request.POST)
 
         #creating pickles 
@@ -126,25 +119,28 @@ def index(request):
             # 'distVal': bestcontent,
         }
 
-
     if 'stop' in request.POST:
         form = TSPForm(request.POST)
 
         j_status = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $5}' " ).read().rstrip('\n')
         print(j_status)
-        if j_status == "PD": 
+        if j_status == "PD" or j_status == 'R': 
             j_id = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $1}' " ).read().rstrip('\n')
             print('First condition: looking for  running job on owens')
             os.system('touch STOP')
             os.system("ssh " +owens+" scancel "+str(j_id))
-            message_d = 'Stop Without Care'
+            message_d = 'Stopped'
+        
         else:
-            os.system('touch STOP')
             time.sleep(10)
             j_id = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $1}' " ).read().rstrip('\n')
-            print('Second Condition: looking for   runnign job on owens')
+            # print('Second Condition: looking for   runnign job on owens')
             os.system("ssh " +owens+" scancel "+str(j_id))
+            work.kill()
             message_d = 'Stopped with Values'
+            os.system("scp cleanupcrew.sh"+owens+":")
+            os.system('ssh '+owens+' "source cleanupcrew.sh" ')    
+            os.system('ssh '+owens+' "rm cleanupcrew.sh" ') 
 
         context = {
             'form': form,
@@ -152,8 +148,6 @@ def index(request):
             'jbstatus': 'nstarted'
         }
  
-        
-
 
     if 'reset' in request.POST:
         form = TSPForm()
@@ -167,8 +161,12 @@ def index(request):
         if j_status == "R":
             j_id = os.popen("ssh "+ owens + " squeue -u w140bxj | tail -1 | awk '{print $1}' " ).read().rstrip('\n')
             os.system("ssh " +owens+" scancel "+str(j_id))
-
         work.kill()
+        os.system("scp cleanupcrew.sh"+owens+":")
+        os.system('ssh '+owens+' "source cleanupcrew.sh" ')    
+        os.system('ssh '+owens+' "rm cleanupcrew.sh" ') 
+        
+          
 
     
     return render(request, 'core/index.html', context)

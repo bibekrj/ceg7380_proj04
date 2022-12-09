@@ -38,10 +38,10 @@ current_best_MYATTEMPT_NUM=`grep "BEST" ../resultsMYATTEMPT.txt | cut -d ":" -f2
 
 #echo $current_best_MYATTEMPT_NUM
 
-best_pickle_file=`grep "$current_best_MYATTEMPT_NUM" ../resultsMYATTEMPT.txt | cut -d ":" -f1 | head -n 1`
+best_pickle_file=`grep "$current_best_MYATTEMPT_NUM" ../resultsMYATTEMPT.txt | head -n1 | cut -d ":" -f1`
 
 #touch best_ATTEMPTNUM_detail.txt
-echo $current_best_MYATTEMPT_NUM >>  job_MYATTEMPT_detail.txt
+echo $current_best_MYATTEMPT_NUM >  job_MYATTEMPT_detail.txt
 
 echo $best_pickle_file >> job_MYATTEMPT_detail.txt
 
